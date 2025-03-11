@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ONLINE EQUATION GENERATOR FIND X TEST</title>
+    <style>
+        /* Basic reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #2c3e50;
+        }
+
+        h3 {
+            margin: 10px 0;
+            color: #34495e;
+        }
+
+        .equation-container {
+            margin-bottom: 20px;
+        }
+
+        input[type="text"] {
+            width: 200px;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px;
+            display: block;
+            width: 200px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        #result {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .correct {
+            color: green;
+        }
+
+        .incorrect {
+            color: red;
+        }
+
+        #equations {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>ONLINE EQUATION GENERATOR FIND X TEST</h1>
+
+    <div id="equations">
+        <!-- Equations will be dynamically inserted here -->
+    </div>
+
+    <button id="checkBtn">Check Answers</button>
+    <button id="restartBtn">Restart</button>
+
+    <div id="result"></div>
+
+    <script>
+        // Fraction class to handle rational numbers and their operations
+        class Fraction {
+            constructor(numerator, denominator) {
+                this.numerator = numerator;
+                this.denominator = denominator;
+            }
+
+            // Adds two fractions
+            add(other) {
+                let newDenominator = this.denominator * other.denominator;
+                let newNumerator = (this.numerator * other.denominator) + (other.numerator * this.denominator);
+                return new Fraction(newNumerator, newDenominator);
+            }
+
+            // Subtracts two fractions
+            subtract(other) {
+                let newDenominator = this.denominator * other.denominator;
+                let newNumerator = (this.numerator * other.denominator) - (other.numerator * this.denominator);
+                return new Fraction(newNumerator, newDenominator);
+            }
+
+            // Multiplies two fractions
+            multiply(other) {
+                return new Fraction(this.numerator * other.numerator, this.denominator * other.denominator);
+            }
+
+            // Divides two fractions
+            divide(other) {
+                return new Fraction(this.numerator * other.denominator, this.denominator * other.numerator);
+            }
+
+            // Converts the fraction to a string (a/b format)
+            toString() {
+                return `${this.numerator}/${this.denominator}`;
+            }
+
+            // Converts the fraction to a decimal
+            toDecimal() {
+                return this.numerator / this.denominator;
+            }
+        }
+
+        // Helper function to generate random integers
+        function randomInt(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        // Helper function to randomly select an element from an array
+        function randomChoice(arr) {
+            return arr[Math.floor(Math.random() * arr.length)];
+        }
+
+        // Function to generate a random equation
+        function generateEquation() {
+            // Generate random rational numbers
+            let a = new Fraction(randomInt(-10, 10), randomInt(1, 10));
+            let b = new Fraction(randomInt(-10, 10), randomInt(1, 10));
+            let c = new Fraction(randomInt(-10, 10), randomInt(1, 10));
+
+            // Randomly choose an operator
+            let operator = randomChoice(['+', '-', '*', '/']);
+
+            let result, equation, blank;
+            
+            // Construct the equation based on the operator
+            if (operator === '+') {
+                result = a.add(b);
+                equation = `${a} + ${b} + ___ = ${result.add(c)}`;
+                blank = c;
+            } else if (operator === '-') {
+                result = a.subtract(b);
+                equation = `${a} - ${b} + ___ = ${result.add(c)}`;
+                blank = c;
+            } else if (operator === '*') {
+                result = a.multiply(b);
+                equation = `${a} * ${b} + ___ = ${result.add(c)}`;
+                blank = c;
+            } else if (operator === '/') {
+                result = a.divide(b);
+                equation = `${a} / ${b} + ___ = ${result.add(c)}`;
+                blank = c;
+            }
+
+            return { equation, blank };
+        }
+
+        // Function to generate 10 random equations
+        function generateEquations() {
+            let equations = [];
+            for (let i = 0; i < 10; i++) {
+                equations.push(generateEquation());
+            }
+            return equations;
+        }
+
+        // Function to display the equations on the page
+        function displayEquations() {
+            const equations = generateEquations();
+            let equationsDiv = document.getElementById('equations');
+            equationsDiv.innerHTML = '';
+
+            equations.forEach((eq, index) => {
+                equationsDiv.innerHTML += `
+                    <div class="equation-container">
+                        <h3>Question ${index + 1}: ${eq.equation}</h3>
+                        <input type="text" id="answer${index}" placeholder="Enter your answer">
+                    </div>
+                `;
+            });
+        }
+
+        // Function to check the answers
+        function checkAnswers() {
+            const equations = generateEquations();
+            let resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '';
+            let correctCount = 0;
+
+            equations.forEach((eq, index) => {
+                let userAnswer = document.getElementById(`answer${index}`).value.trim();
+
+                let correctAnswer = eq.blank.toDecimal();
+                let userAnswerDecimal = parseFloat(userAnswer);
+
+                // Round the answer to two decimal places for comparison
+                if (Math.abs(userAnswerDecimal - correctAnswer.toFixed(2)) < 0.01 || userAnswerDecimal === correctAnswer) {
+                    correctCount++;
+                    resultDiv.innerHTML += `<p class="correct">✅ Question ${index + 1}: Correct</p>`;
+                } else {
+                    resultDiv.innerHTML += `<p class="incorrect">❌ Question ${index + 1}: Wrong. Correct answer is ${correctAnswer.toFixed(2)}</p>`;
+                }
+            });
+
+            resultDiv.innerHTML += `<p>Total Correct: ${correctCount}/10</p>`;
+        }
+
+        // Function to restart the quiz
+        function restart() {
+            displayEquations();
+            document.getElementById('result').innerHTML = '';
+        }
+
+        // Set up event listeners
+        document.getElementById('checkBtn').addEventListener('click', checkAnswers);
+        document.getElementById('restartBtn').addEventListener('click', restart);
+
+        // Initial setup: Display the equations
+        displayEquations();
+    </script>
+
+</body>
+</html>
