@@ -95,6 +95,8 @@
     <div id="result"></div>
 
     <script>
+        let currentEquations = []; // Store the generated equations globally
+
         // Fraction class to handle rational numbers and their operations
         class Fraction {
             constructor(numerator, denominator) {
@@ -192,11 +194,11 @@
 
         // Function to display the equations on the page
         function displayEquations() {
-            const equations = generateEquations();
+            currentEquations = generateEquations(); // Store the equations for later
             let equationsDiv = document.getElementById('equations');
             equationsDiv.innerHTML = '';
 
-            equations.forEach((eq, index) => {
+            currentEquations.forEach((eq, index) => {
                 equationsDiv.innerHTML += `
                     <div class="equation-container">
                         <h3>Question ${index + 1}: ${eq.equation}</h3>
@@ -206,30 +208,32 @@
             });
         }
 
+
         // Function to check the answers
         function checkAnswers() {
-            const equations = generateEquations();
             let resultDiv = document.getElementById('result');
             resultDiv.innerHTML = '';
             let correctCount = 0;
 
-            equations.forEach((eq, index) => {
+            currentEquations.forEach((eq, index) => {
                 let userAnswer = document.getElementById(`answer${index}`).value.trim();
 
                 let correctAnswer = eq.blank.toDecimal();
+                let truncatedCorrect = Math.trunc(correctAnswer * 100) / 100;
                 let userAnswerDecimal = parseFloat(userAnswer);
 
-                // Round the answer to two decimal places for comparison
-                if (Math.abs(userAnswerDecimal - correctAnswer.toFixed(2)) < 0.01 || userAnswerDecimal === correctAnswer) {
+                if (Math.abs(userAnswerDecimal - truncatedCorrect) < 0.01) {
                     correctCount++;
                     resultDiv.innerHTML += `<p class="correct">✅ Question ${index + 1}: Correct</p>`;
                 } else {
-                    resultDiv.innerHTML += `<p class="incorrect">❌ Question ${index + 1}: Wrong. Correct answer is ${correctAnswer.toFixed(2)}</p>`;
+                    resultDiv.innerHTML += `<p class="incorrect">❌ Question ${index + 1}: Wrong. Correct answer is ${truncatedCorrect}</p>`;
                 }
             });
 
             resultDiv.innerHTML += `<p>Total Correct: ${correctCount}/10</p>`;
         }
+
+
 
         // Function to restart the quiz
         function restart() {
