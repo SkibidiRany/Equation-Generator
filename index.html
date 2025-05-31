@@ -96,6 +96,7 @@
 
     <script>
         let currentEquations = []; // Store the generated equations globally
+        let variableName = 'X';
 
         // Fraction class to handle rational numbers and their operations
         class Fraction {
@@ -164,19 +165,19 @@
             // Construct the equation based on the operator
             if (operator === '+') {
                 result = a.add(b);
-                equation = `${a} + ${b} + ___ = ${result.add(c)}`;
+                equation = `${a} + ${b} + ${variableName} = ${result.add(c)}`;
                 blank = c;
             } else if (operator === '-') {
                 result = a.subtract(b);
-                equation = `${a} - ${b} + ___ = ${result.add(c)}`;
+                equation = `${a} - ${b} + ${variableName} = ${result.add(c)}`;
                 blank = c;
             } else if (operator === '*') {
                 result = a.multiply(b);
-                equation = `${a} * ${b} + ___ = ${result.add(c)}`;
+                equation = `${a} * ${b} + ${variableName} = ${result.add(c)}`;
                 blank = c;
             } else if (operator === '/') {
                 result = a.divide(b);
-                equation = `${a} / ${b} + ___ = ${result.add(c)}`;
+                equation = `${a} / ${b} + ${variableName} = ${result.add(c)}`;
                 blank = c;
             }
 
